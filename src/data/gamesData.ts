@@ -7,7 +7,7 @@ export interface Game {
   genres: string[];
   platform: string;
   releaseYear: number;
-  rating: string;
+  rating: number; // Changed from string to number
   sponsored?: boolean;
   isFree?: boolean;
   trailer?: string;
@@ -23,7 +23,7 @@ export const allGames: Game[] = [
     genres: ["Action", "Adventure"],
     platform: "PC",
     releaseYear: 2013,
-    rating: "M",
+    rating: 4.5, // Changed from string to number
   },
   {
     id: 2,
@@ -33,7 +33,7 @@ export const allGames: Game[] = [
     genres: ["Racing", "Simulation"],
     platform: "PC",
     releaseYear: 2021,
-    rating: "E",
+    rating: 4.8, // Changed from string to number
     sponsored: true,
   },
   {
@@ -44,7 +44,7 @@ export const allGames: Game[] = [
     genres: ["Sandbox", "Adventure"],
     platform: "PC",
     releaseYear: 2011,
-    rating: "E",
+    rating: 4.7, // Changed from string to number
   },
   {
     id: 6,
@@ -54,7 +54,7 @@ export const allGames: Game[] = [
     genres: ["RPG", "Action"],
     platform: "PC",
     releaseYear: 2020,
-    rating: "M",
+    rating: 4.0, // Changed from string to number
   }
 ];
 

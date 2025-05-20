@@ -137,7 +137,7 @@ const GameDetails = () => {
                     </div>
                     <div>
                       <h3 className="font-medium mb-1">Rating</h3>
-                      <p className="text-muted-foreground">{game.rating}</p>
+                      <p className="text-muted-foreground">{game.rating.toFixed(1)}</p>
                     </div>
                   </div>
                 </motion.div>
