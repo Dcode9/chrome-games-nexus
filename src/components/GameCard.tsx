@@ -8,11 +8,10 @@ interface GameCardProps {
   title: string;
   image: string;
   genres: string[];
-  platform: string;
   sponsored?: boolean;
 }
 
-const GameCard = ({ id, title, image, genres, platform, sponsored }: GameCardProps) => {
+const GameCard = ({ id, title, image, genres, sponsored }: GameCardProps) => {
   return (
     <Link to={`/game/${id}`} className="group">
       <Card className="glass-card overflow-hidden h-full transition-all duration-300 hover:shadow-lg hover:shadow-primary/20">
@@ -23,9 +22,6 @@ const GameCard = ({ id, title, image, genres, platform, sponsored }: GameCardPro
             className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105" 
           />
           <div className="absolute top-2 right-2 space-x-1">
-            {platform === "PC" && <Badge variant="secondary">PC</Badge>}
-            {platform === "Console" && <Badge variant="secondary">Console</Badge>}
-            {platform === "Mobile" && <Badge variant="secondary">Mobile</Badge>}
             {sponsored && <Badge variant="outline" className="bg-primary/20 text-primary-foreground">Sponsored</Badge>}
           </div>
         </div>
