@@ -2,6 +2,7 @@
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
+import GameCard from "@/components/GameCard";
 import GameGrid from "@/components/GameGrid";
 import Footer from "@/components/Footer";
 import { Badge } from "@/components/ui/badge";

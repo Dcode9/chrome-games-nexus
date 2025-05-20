@@ -1,6 +1,6 @@
-
 import { useState } from "react";
 import Navigation from "@/components/Navigation";
+import GameCard from "@/components/GameCard";
 import GameGrid from "@/components/GameGrid";
 import FilterBar from "@/components/FilterBar";
 import AdBanner from "@/components/AdBanner";
