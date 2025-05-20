@@ -6,7 +6,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { filter } from "lucide-react";
+import { Filter } from "lucide-react";
 
 const genres = [
   "All",
@@ -38,7 +38,7 @@ const FilterBar = ({ onFilterChange }: FilterBarProps) => {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="text-sm gap-2">
                 Genre
-                <filter className="h-4 w-4" />
+                <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -57,7 +57,7 @@ const FilterBar = ({ onFilterChange }: FilterBarProps) => {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="text-sm gap-2">
                 Platform
-                <filter className="h-4 w-4" />
+                <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
@@ -76,7 +76,7 @@ const FilterBar = ({ onFilterChange }: FilterBarProps) => {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="text-sm gap-2">
                 Sort By
-                <filter className="h-4 w-4" />
+                <Filter className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
