@@ -1,13 +1,24 @@
 
 import { useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import Navigation from "@/components/Navigation";
 import GameCard from "@/components/GameCard";
-import GameSidebar from "@/components/GameSidebar";
 import AdBanner from "@/components/AdBanner";
 import Footer from "@/components/Footer";
 import { allGames, Game } from "@/data/gamesData";
 import { Button } from "@/components/ui/button";
+import Navigation from "@/components/Navigation";
+
+const genres = [
+  "All",
+  "Action",
+  "Adventure",
+  "RPG",
+  "Strategy",
+  "Shooter",
+  "Sports",
+  "Simulation",
+  "Puzzle",
+  "Horror",
+];
 
 const Games = () => {
   const [filteredGames, setFilteredGames] = useState<Game[]>(allGames);
@@ -63,22 +74,33 @@ const Games = () => {
     <div className="flex flex-col min-h-screen">
       <Navigation />
       
-      <div className="flex-1">
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full">
-            <GameSidebar 
-              onSearch={handleSearch}
-              onFilterChange={handleFilterChange}
-              currentGenre={currentFilters.genre}
-              currentSort={currentFilters.sort}
-            />
-            
-            <main className="flex-1 py-6 transition-all duration-300 animate-fade-in">
-              <div className="container px-4 md:px-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-3xl font-bold">PC Games Catalog</h1>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-sm text-muted-foreground mr-2">Sort:</div>
+      <main className="flex-1 transition-all duration-300 animate-fade-in">
+        <div className="sticky top-16 z-40 bg-background/95 backdrop-blur-sm border-b">
+          <div className="container px-4 md:px-6 py-4">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <h1 className="text-3xl font-bold">PC Games Catalog</h1>
+              
+              <div className="flex flex-wrap gap-2 md:gap-4">
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-muted-foreground">Genre:</div>
+                  <div className="flex flex-wrap gap-1">
+                    {genres.map((genre) => (
+                      <Button 
+                        key={genre}
+                        size="sm"
+                        variant={currentFilters.genre === genre ? "default" : "outline"}
+                        onClick={() => handleFilterChange("genre", genre)}
+                        className="h-8"
+                      >
+                        {genre}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <div className="text-sm text-muted-foreground">Sort:</div>
+                  <div className="flex gap-1">
                     {["Popular", "New", "A-Z"].map((sortOption) => (
                       <Button 
                         key={sortOption}
@@ -92,43 +114,45 @@ const Games = () => {
                     ))}
                   </div>
                 </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="md:col-span-3">
-                    {filteredGames.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredGames.map((game) => (
-                          <div key={game.id} className="animate-fade-in">
-                            <GameCard
-                              id={game.id}
-                              title={game.title}
-                              image={game.image}
-                              genres={game.genres}
-                              sponsored={game.sponsored}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <h3 className="text-xl font-medium mb-2">No games found</h3>
-                        <p className="text-muted-foreground">
-                          Try adjusting your filters to find what you're looking for
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <AdBanner type="sidebar" />
-                    <AdBanner type="sidebar" />
-                  </div>
-                </div>
               </div>
-            </main>
+            </div>
           </div>
-        </SidebarProvider>
-      </div>
+        </div>
+        
+        <div className="container px-4 md:px-6 py-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div className="md:col-span-3">
+              {filteredGames.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {filteredGames.map((game) => (
+                    <div key={game.id} className="animate-fade-in">
+                      <GameCard
+                        id={game.id}
+                        title={game.title}
+                        image={game.image}
+                        genres={game.genres}
+                        sponsored={game.sponsored}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <h3 className="text-xl font-medium mb-2">No games found</h3>
+                  <p className="text-muted-foreground">
+                    Try adjusting your filters to find what you're looking for
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="space-y-6">
+              <AdBanner type="sidebar" />
+              <AdBanner type="sidebar" />
+            </div>
+          </div>
+        </div>
+      </main>
       
       <Footer />
     </div>
