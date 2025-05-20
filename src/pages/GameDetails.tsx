@@ -1,4 +1,3 @@
-
 import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import Navigation from "@/components/Navigation";
@@ -167,7 +166,6 @@ const GameDetails = () => {
                       title={relatedGame.title}
                       image={relatedGame.image}
                       genres={relatedGame.genres}
-                      platform={relatedGame.platform}
                       sponsored={relatedGame.sponsored}
                     />
                   </div>
