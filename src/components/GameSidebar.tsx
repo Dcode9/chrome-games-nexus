@@ -1,6 +1,7 @@
 
 import { useState } from "react";
-import { Search, SlidersHorizontal, PanelLeft, PanelRight } from "lucide-react";
+import { Search, SlidersHorizontal, PanelLeft, PanelRight, Home, Calendar } from "lucide-react";
+import { Link } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +16,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { allGames } from "@/data/gamesData";
 
 const genres = [
   "All",
@@ -29,7 +31,11 @@ const genres = [
   "Horror",
 ];
 
-const sortOptions = ["Popular", "New", "A-Z", "Price"];
+const upcomingGames = [
+  { title: "Elder Scrolls VI", releaseYear: 2026 },
+  { title: "GTA VI", releaseYear: 2026 },
+  { title: "Starfield 2", releaseYear: 2027 },
+];
 
 interface GameSidebarProps {
   onSearch: (query: string) => void;
@@ -69,6 +75,12 @@ const GameSidebar = ({
         </Button>
         
         <SidebarHeader className={`p-4 ${isCollapsed ? "hidden" : "block"}`}>
+          <Link to="/" className="flex items-center gap-2 mb-6">
+            <span className="font-exo text-xl font-bold bg-gradient-to-r from-primary to-primary-foreground bg-clip-text text-transparent">
+              D'Games
+            </span>
+          </Link>
+          
           <form onSubmit={handleSearch} className="flex gap-2">
             <Input
               type="search"
@@ -84,6 +96,38 @@ const GameSidebar = ({
         </SidebarHeader>
         
         <SidebarContent className={isCollapsed ? "hidden" : "block"}>
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              Navigation
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="transition-all duration-200 hover:translate-x-1"
+                  >
+                    <Link to="/">
+                      <Home className="h-4 w-4 mr-2" />
+                      Home
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    asChild
+                    className="transition-all duration-200 hover:translate-x-1"
+                  >
+                    <Link to="/games">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      Games
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center gap-2">
               <SlidersHorizontal className="h-4 w-4" />
@@ -108,19 +152,17 @@ const GameSidebar = ({
           
           <SidebarGroup>
             <SidebarGroupLabel className="flex items-center gap-2">
-              <SlidersHorizontal className="h-4 w-4" />
-              Sort By
+              Upcoming Games
             </SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {sortOptions.map((option) => (
-                  <SidebarMenuItem key={option}>
+                {upcomingGames.map((game) => (
+                  <SidebarMenuItem key={game.title}>
                     <SidebarMenuButton
-                      isActive={currentSort === option}
-                      onClick={() => onFilterChange("sort", option)}
                       className="transition-all duration-200 hover:translate-x-1"
                     >
-                      {option}
+                      <span className="flex-1 text-left">{game.title}</span>
+                      <span className="text-xs text-muted-foreground">{game.releaseYear}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 ))}
@@ -133,7 +175,7 @@ const GameSidebar = ({
           <div className="p-4">
             <Button variant="ghost" size="sm" onClick={toggleSidebar} className="w-full justify-start">
               <Search className="h-4 w-4 mr-2" />
-              Search
+              Menu
             </Button>
           </div>
         )}

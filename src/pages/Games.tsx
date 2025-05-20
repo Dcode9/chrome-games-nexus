@@ -7,6 +7,7 @@ import GameSidebar from "@/components/GameSidebar";
 import AdBanner from "@/components/AdBanner";
 import Footer from "@/components/Footer";
 import { allGames, Game } from "@/data/gamesData";
+import { Button } from "@/components/ui/button";
 
 const Games = () => {
   const [filteredGames, setFilteredGames] = useState<Game[]>(allGames);
@@ -74,7 +75,23 @@ const Games = () => {
             
             <main className="flex-1 py-6 transition-all duration-300 animate-fade-in">
               <div className="container px-4 md:px-6">
-                <h1 className="text-3xl font-bold mb-8">PC Games Catalog</h1>
+                <div className="flex items-center justify-between mb-6">
+                  <h1 className="text-3xl font-bold">PC Games Catalog</h1>
+                  <div className="flex items-center space-x-2">
+                    <div className="text-sm text-muted-foreground mr-2">Sort:</div>
+                    {["Popular", "New", "A-Z"].map((sortOption) => (
+                      <Button 
+                        key={sortOption}
+                        size="sm"
+                        variant={currentFilters.sort === sortOption ? "default" : "outline"}
+                        onClick={() => handleFilterChange("sort", sortOption)}
+                        className="h-8"
+                      >
+                        {sortOption}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                   <div className="md:col-span-3">
