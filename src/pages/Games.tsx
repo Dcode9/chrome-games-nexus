@@ -72,7 +72,7 @@ const Games = () => {
               currentSort={currentFilters.sort}
             />
             
-            <main className="flex-1 py-6">
+            <main className="flex-1 py-6 transition-all duration-300 animate-fade-in">
               <div className="container px-4 md:px-6">
                 <h1 className="text-3xl font-bold mb-8">PC Games Catalog</h1>
                 
@@ -81,7 +81,7 @@ const Games = () => {
                     {filteredGames.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredGames.map((game) => (
-                          <div key={game.id}>
+                          <div key={game.id} className="animate-fade-in">
                             <GameCard
                               id={game.id}
                               title={game.title}

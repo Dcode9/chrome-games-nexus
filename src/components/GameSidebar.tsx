@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Search, SlidersHorizontal, PanelLeft, PanelRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   SidebarMenuButton,
+  SidebarTrigger,
 } from "@/components/ui/sidebar";
 
 const genres = [
@@ -44,72 +45,99 @@ const GameSidebar = ({
   currentSort 
 }: GameSidebarProps) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     onSearch(searchQuery);
   };
 
+  const toggleSidebar = () => {
+    setIsCollapsed(!isCollapsed);
+  };
+
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <form onSubmit={handleSearch} className="flex gap-2">
-          <Input
-            type="search"
-            placeholder="Search games..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="h-9"
-          />
-          <Button type="submit" size="sm" variant="outline" className="h-9 px-2">
-            <Search className="h-4 w-4" />
-          </Button>
-        </form>
-      </SidebarHeader>
-      
-      <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4" />
-            Genres
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {genres.map((genre) => (
-                <SidebarMenuItem key={genre}>
-                  <SidebarMenuButton
-                    isActive={currentGenre === genre}
-                    onClick={() => onFilterChange("genre", genre)}
-                  >
-                    {genre}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+      <div className={`flex ${isCollapsed ? "flex-col-reverse" : "flex-col"} h-full relative`}>
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 z-10"
+          onClick={toggleSidebar}
+        >
+          {isCollapsed ? <PanelRight className="h-4 w-4" /> : <PanelLeft className="h-4 w-4" />}
+        </Button>
         
-        <SidebarGroup>
-          <SidebarGroupLabel className="flex items-center gap-2">
-            <SlidersHorizontal className="h-4 w-4" />
-            Sort By
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {sortOptions.map((option) => (
-                <SidebarMenuItem key={option}>
-                  <SidebarMenuButton
-                    isActive={currentSort === option}
-                    onClick={() => onFilterChange("sort", option)}
-                  >
-                    {option}
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
+        <SidebarHeader className={`p-4 ${isCollapsed ? "hidden" : "block"}`}>
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <Input
+              type="search"
+              placeholder="Search games..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-9 transition-all duration-300 ease-in-out"
+            />
+            <Button type="submit" size="sm" variant="outline" className="h-9 px-2">
+              <Search className="h-4 w-4" />
+            </Button>
+          </form>
+        </SidebarHeader>
+        
+        <SidebarContent className={isCollapsed ? "hidden" : "block"}>
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              Genres
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {genres.map((genre) => (
+                  <SidebarMenuItem key={genre}>
+                    <SidebarMenuButton
+                      isActive={currentGenre === genre}
+                      onClick={() => onFilterChange("genre", genre)}
+                      className="transition-all duration-200 hover:translate-x-1"
+                    >
+                      {genre}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          
+          <SidebarGroup>
+            <SidebarGroupLabel className="flex items-center gap-2">
+              <SlidersHorizontal className="h-4 w-4" />
+              Sort By
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {sortOptions.map((option) => (
+                  <SidebarMenuItem key={option}>
+                    <SidebarMenuButton
+                      isActive={currentSort === option}
+                      onClick={() => onFilterChange("sort", option)}
+                      className="transition-all duration-200 hover:translate-x-1"
+                    >
+                      {option}
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+
+        {isCollapsed && (
+          <div className="p-4">
+            <Button variant="ghost" size="sm" onClick={toggleSidebar} className="w-full justify-start">
+              <Search className="h-4 w-4 mr-2" />
+              Search
+            </Button>
+          </div>
+        )}
+      </div>
     </Sidebar>
   );
 };

@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -102,18 +103,91 @@
   }
 
   .scroll-x {
-    @apply flex overflow-x-auto py-2 gap-4 pb-4 scrollbar-thin scrollbar-track-transparent;
+    @apply flex overflow-x-auto py-2 gap-4 pb-4;
     scroll-snap-type: x mandatory;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary)) transparent;
   }
 
   .scroll-x::-webkit-scrollbar {
-    display: none;
+    height: 6px;
+  }
+
+  .scroll-x::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary));
+    border-radius: 3px;
+  }
+
+  .scroll-x::-webkit-scrollbar-track {
+    background-color: transparent;
   }
 
   .scroll-item {
     @apply flex-none;
     scroll-snap-align: start;
+  }
+
+  /* Custom Scrollbars */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: hsl(var(--primary)/0.5);
+    border-radius: 4px;
+    transition: background-color 0.2s;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(var(--primary));
+  }
+
+  /* Page Transition Animations */
+  .page-enter {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  .page-enter-active {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 300ms, transform 300ms;
+  }
+
+  .page-exit {
+    opacity: 1;
+  }
+
+  .page-exit-active {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: opacity 300ms, transform 300ms;
+  }
+
+  /* Button hover effects */
+  .game-btn-hover:before {
+    content: attr(data-price);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+    border-radius: var(--radius);
+  }
+
+  .game-btn-hover:hover:before {
+    transform: translateY(0);
   }
 }
