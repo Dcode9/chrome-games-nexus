@@ -6,8 +6,8 @@ import GameGrid from "@/components/GameGrid";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { allGames } from "@/data/gamesData";
 import Footer from "@/components/Footer";
-import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Navigation from "@/components/Navigation";
 
 const Games = () => {
   const navigate = useNavigate();
@@ -41,9 +41,9 @@ const Games = () => {
   // Sort games based on current sort option
   const sortedGames = [...filteredGames].sort((a, b) => {
     if (currentSort === "price-asc") {
-      return parseFloat(a.price) - parseFloat(b.price);
+      return parseFloat(a.price || "0") - parseFloat(b.price || "0");
     } else if (currentSort === "price-desc") {
-      return parseFloat(b.price) - parseFloat(a.price);
+      return parseFloat(b.price || "0") - parseFloat(a.price || "0");
     } else if (currentSort === "rating") {
       return (b.rating || 0) - (a.rating || 0);
     } else {
@@ -64,16 +64,7 @@ const Games = () => {
           />
           
           <main className="flex-1 transition-all duration-300 ease-in-out">
-            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
-              <div className="container flex items-center justify-between h-16 px-4">
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-                    <ArrowLeft className="w-5 h-5" />
-                  </Button>
-                  <h1 className="text-2xl font-bold">PC Games Catalog</h1>
-                </div>
-              </div>
-            </div>
+            <Navigation title="PC Games Catalog" />
 
             <div className="container px-4 py-6">
               <div className="mb-6">

@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface GameCardProps {
-  id: number;
+  id: number | string;
   title: string;
   image: string;
   genres: string[];

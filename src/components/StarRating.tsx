@@ -8,10 +8,12 @@ interface StarRatingProps {
   readonly?: boolean;
   onChange?: (rating: number) => void;
   size?: 'sm' | 'md' | 'lg';
+  rating?: number; // Added this prop for compatibility
 }
 
-const StarRating = ({ initialRating = 0, readonly = false, onChange, size = 'md' }: StarRatingProps) => {
-  const [rating, setRating] = useState(initialRating);
+const StarRating = ({ initialRating = 0, readonly = false, onChange, size = 'md', rating }: StarRatingProps) => {
+  // Use rating prop if provided, otherwise use initialRating
+  const [internalRating, setInternalRating] = useState(rating || initialRating);
   const [hoverRating, setHoverRating] = useState(0);
 
   const sizeClasses = {
@@ -22,9 +24,12 @@ const StarRating = ({ initialRating = 0, readonly = false, onChange, size = 'md'
 
   const handleRatingChange = (newRating: number) => {
     if (readonly) return;
-    setRating(newRating);
+    setInternalRating(newRating);
     if (onChange) onChange(newRating);
   };
+
+  // Determine which rating to display
+  const displayRating = rating !== undefined ? rating : internalRating;
 
   return (
     <div className="flex items-center">
@@ -45,7 +50,7 @@ const StarRating = ({ initialRating = 0, readonly = false, onChange, size = 'md'
             className={cn(
               sizeClasses[size],
               "transition-colors duration-200",
-              (hoverRating || rating) >= star 
+              (hoverRating || displayRating) >= star 
                 ? "fill-yellow-400 text-yellow-400" 
                 : "text-gray-300 fill-transparent"
             )}
