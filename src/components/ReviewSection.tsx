@@ -27,7 +27,7 @@ const initialReviews = [
 ];
 
 interface ReviewProps {
-  gameId: number;
+  gameId: number | string; // Updated to accept both number and string
 }
 
 interface Review {
