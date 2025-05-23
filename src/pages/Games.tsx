@@ -1,137 +1,126 @@
 
 import { useState } from "react";
-import { SidebarProvider } from "@/components/ui/sidebar";
-import Navigation from "@/components/Navigation";
-import GameCard from "@/components/GameCard";
+import { useNavigate } from "react-router-dom";
 import GameSidebar from "@/components/GameSidebar";
-import AdBanner from "@/components/AdBanner";
+import GameGrid from "@/components/GameGrid";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { allGames } from "@/data/gamesData";
 import Footer from "@/components/Footer";
-import { allGames, Game } from "@/data/gamesData";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const Games = () => {
-  const [filteredGames, setFilteredGames] = useState<Game[]>(allGames);
-  const [currentFilters, setCurrentFilters] = useState({
-    genre: "All",
-    sort: "Popular",
-    search: "",
-  });
-
-  const handleFilterChange = (filter: string, value: string) => {
-    const newFilters = { ...currentFilters, [filter]: value };
-    setCurrentFilters(newFilters);
-    
-    // Apply filters
-    let result = [...allGames];
-    
-    // Filter by genre
-    if (newFilters.genre !== "All") {
-      result = result.filter(game => 
-        game.genres.includes(newFilters.genre)
-      );
-    }
-    
-    // Apply search
-    if (newFilters.search.trim()) {
-      const searchLower = newFilters.search.toLowerCase();
-      result = result.filter(game => 
-        game.title.toLowerCase().includes(searchLower) ||
-        game.genres.some(genre => genre.toLowerCase().includes(searchLower))
-      );
-    }
-    
-    // Apply sorting
-    switch (newFilters.sort) {
-      case "New":
-        result.sort((a, b) => b.releaseYear - a.releaseYear);
-        break;
-      case "A-Z":
-        result.sort((a, b) => a.title.localeCompare(b.title));
-        break;
-      default: // Popular - no specific sort, use default order
-        break;
-    }
-    
-    setFilteredGames(result);
-  };
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentGenre, setCurrentGenre] = useState("All");
+  const [currentSort, setCurrentSort] = useState("popularity");
 
   const handleSearch = (query: string) => {
-    handleFilterChange("search", query);
+    setSearchQuery(query);
   };
 
+  const handleFilterChange = (filter: string, value: string) => {
+    if (filter === "genre") {
+      setCurrentGenre(value);
+    } else if (filter === "sort") {
+      setCurrentSort(value);
+    }
+  };
+
+  // Filter games based on search query and genre
+  const filteredGames = allGames.filter(game => {
+    const matchesSearch = searchQuery === "" || 
+      game.title.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    const matchesGenre = currentGenre === "All" || 
+      (game.genres && game.genres.includes(currentGenre));
+    
+    return matchesSearch && matchesGenre;
+  });
+
+  // Sort games based on current sort option
+  const sortedGames = [...filteredGames].sort((a, b) => {
+    if (currentSort === "price-asc") {
+      return parseFloat(a.price) - parseFloat(b.price);
+    } else if (currentSort === "price-desc") {
+      return parseFloat(b.price) - parseFloat(a.price);
+    } else if (currentSort === "rating") {
+      return (b.rating || 0) - (a.rating || 0);
+    } else {
+      // default: sort by popularity (which is the original order)
+      return 0;
+    }
+  });
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navigation />
-      
-      <div className="flex-1">
-        <SidebarProvider>
-          <div className="min-h-screen flex w-full">
-            <GameSidebar 
-              onSearch={handleSearch}
-              onFilterChange={handleFilterChange}
-              currentGenre={currentFilters.genre}
-              currentSort={currentFilters.sort}
-            />
-            
-            <main className="flex-1 py-6 transition-all duration-300 animate-fade-in">
-              <div className="container px-4 md:px-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h1 className="text-3xl font-bold">PC Games Catalog</h1>
-                  <div className="flex items-center space-x-2">
-                    <div className="text-sm text-muted-foreground mr-2">Sort:</div>
-                    {["Popular", "New", "A-Z"].map((sortOption) => (
-                      <Button 
-                        key={sortOption}
-                        size="sm"
-                        variant={currentFilters.sort === sortOption ? "default" : "outline"}
-                        onClick={() => handleFilterChange("sort", sortOption)}
-                        className="h-8"
-                      >
-                        {sortOption}
-                      </Button>
-                    ))}
+    <SidebarProvider>
+      <div className="flex flex-col min-h-screen">
+        <div className="flex flex-1">
+          <GameSidebar
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            currentGenre={currentGenre}
+            currentSort={currentSort}
+          />
+          
+          <main className="flex-1 transition-all duration-300 ease-in-out">
+            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
+              <div className="container flex items-center justify-between h-16 px-4">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                  <h1 className="text-2xl font-bold">PC Games Catalog</h1>
+                </div>
+              </div>
+            </div>
+
+            <div className="container px-4 py-6">
+              <div className="mb-6">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <div className="flex-1">
+                    <h2 className="text-sm font-medium mb-1">Genre</h2>
+                    <div className="flex flex-wrap gap-2">
+                      {["All", "Action", "Adventure", "RPG", "Strategy", "Shooter"].map(genre => (
+                        <Button
+                          key={genre}
+                          variant={currentGenre === genre ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => handleFilterChange("genre", genre)}
+                        >
+                          {genre}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h2 className="text-sm font-medium mb-1">Sort By</h2>
+                    <select
+                      className="px-3 py-1 rounded border bg-background"
+                      value={currentSort}
+                      onChange={(e) => handleFilterChange("sort", e.target.value)}
+                    >
+                      <option value="popularity">Popularity</option>
+                      <option value="rating">Rating</option>
+                      <option value="price-asc">Price (Low to High)</option>
+                      <option value="price-desc">Price (High to Low)</option>
+                    </select>
                   </div>
                 </div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                  <div className="md:col-span-3">
-                    {filteredGames.length > 0 ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {filteredGames.map((game) => (
-                          <div key={game.id} className="animate-fade-in">
-                            <GameCard
-                              id={game.id}
-                              title={game.title}
-                              image={game.image}
-                              genres={game.genres}
-                              sponsored={game.sponsored}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      <div className="text-center py-12">
-                        <h3 className="text-xl font-medium mb-2">No games found</h3>
-                        <p className="text-muted-foreground">
-                          Try adjusting your filters to find what you're looking for
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="space-y-6">
-                    <AdBanner type="sidebar" />
-                    <AdBanner type="sidebar" />
-                  </div>
+                <div className="text-sm text-muted-foreground">
+                  Showing {sortedGames.length} games
                 </div>
               </div>
-            </main>
-          </div>
-        </SidebarProvider>
+              
+              <GameGrid title="" games={sortedGames} scrollable={false} />
+            </div>
+          </main>
+        </div>
+        <Footer />
       </div>
-      
-      <Footer />
-    </div>
+    </SidebarProvider>
   );
 };
 

@@ -1,259 +1,154 @@
 
-import { useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
-import Navigation from "@/components/Navigation";
-import GameCard from "@/components/GameCard";
-import GameGrid from "@/components/GameGrid";
-import Footer from "@/components/Footer";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { allGames, getRelatedGames } from "@/data/gamesData";
-import StarRating from "@/components/StarRating";
+import GameSidebar from "@/components/GameSidebar";
 import ReviewSection from "@/components/ReviewSection";
-import { motion } from "framer-motion";
+import StarRating from "@/components/StarRating";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { allGames } from "@/data/gamesData";
 
 const GameDetails = () => {
   const { id } = useParams<{ id: string }>();
-  const gameId = parseInt(id || "0");
-  const game = allGames.find((g) => g.id === gameId);
-  const relatedGames = getRelatedGames(gameId);
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentGenre, setCurrentGenre] = useState("All");
+  const [currentSort, setCurrentSort] = useState("popularity");
 
-  // Calculate price based on popularity and rating
-  const calculatePrice = (rating: number, releaseYear: number) => {
-    const basePrice = rating * 10;
-    const yearFactor = Math.max(0, (new Date().getFullYear() - releaseYear)) * 0.5;
-    return Math.max(9.99, basePrice - yearFactor).toFixed(2);
+  const handleSearch = (query: string) => {
+    setSearchQuery(query);
   };
 
-  useEffect(() => {
-    // Scroll to top when game changes
-    window.scrollTo(0, 0);
-  }, [gameId]);
+  const handleFilterChange = (filter: string, value: string) => {
+    if (filter === "genre") {
+      setCurrentGenre(value);
+    } else if (filter === "sort") {
+      setCurrentSort(value);
+    }
+  };
+
+  const game = allGames.find(game => game.id === id);
 
   if (!game) {
-    return (
-      <div className="flex flex-col min-h-screen">
-        <Navigation />
-        <main className="flex-1 container py-12">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold mb-4">Game not found</h1>
-            <p className="mb-6">Sorry, we couldn't find the game you're looking for.</p>
-            <Link to="/games">
-              <Button>Back to Games</Button>
-            </Link>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
+    return <div>Game not found</div>;
   }
-
-  const gamePrice = calculatePrice(game.rating, game.releaseYear);
-
+  
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navigation />
-
-      <main className="flex-1">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5 }}
-        >
-          {/* Game Hero */}
-          <div className="relative h-[50vh] min-h-[300px] max-h-[500px] overflow-hidden">
-            <div className="absolute inset-0">
-              <img
-                src={game.image}
-                alt={game.title}
-                className="object-cover w-full h-full"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-background/30" />
+    <SidebarProvider>
+      <div className="flex flex-col min-h-screen">
+        <div className="flex flex-1">
+          <GameSidebar
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            currentGenre={currentGenre}
+            currentSort={currentSort}
+          />
+          
+          <main className="flex-1 transition-all duration-300 ease-in-out">
+            <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-sm border-b">
+              <div className="container flex items-center justify-between h-16 px-4">
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+                    <ArrowLeft className="w-5 h-5" />
+                  </Button>
+                  <h1 className="text-2xl font-bold">{game.title}</h1>
+                </div>
+              </div>
             </div>
-
-            <div className="container relative z-10 flex flex-col justify-end h-full py-8 px-4 md:px-6">
-              <motion.h1 
-                className="text-4xl font-bold mb-2"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2 }}
-              >
-                {game.title}
-              </motion.h1>
-              <motion.div 
-                className="flex flex-wrap gap-2 mb-2"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
-              >
-                {game.genres.map((genre, index) => (
-                  <Badge key={index} variant="secondary">
-                    {genre}
-                  </Badge>
-                ))}
-                {game.isFree && (
-                  <Badge variant="outline" className="bg-primary/20 text-primary-foreground">
-                    Free to Play
-                  </Badge>
-                )}
-              </motion.div>
-              <motion.div
-                className="flex items-center mb-4"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                <StarRating initialRating={game.rating} readonly size="md" />
-                <span className="ml-2 text-muted-foreground">({game.rating.toFixed(1)})</span>
-              </motion.div>
-              <motion.p 
-                className="text-lg text-muted-foreground max-w-2xl"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.5 }}
-              >
-                {game.description}
-              </motion.p>
-            </div>
-          </div>
-
-          {/* Game Details */}
-          <div className="container px-4 md:px-6 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="md:col-span-2">
-                <motion.div 
-                  className="mb-8"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <h2 className="text-2xl font-bold mb-4">About</h2>
-                  <p className="text-muted-foreground">{game.description}</p>
+            
+            <div className="container px-4 py-6">
+              <div className="flex flex-col lg:flex-row gap-8">
+                <div className="w-full lg:w-2/3">
+                  {/* Game Cover Image */}
+                  <div className="rounded-lg overflow-hidden aspect-video mb-6">
+                    <img 
+                      src={game.coverImage || "/placeholder.svg"} 
+                      alt={game.title} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                   
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    <div>
-                      <h3 className="font-medium mb-1">Release Year</h3>
-                      <p className="text-muted-foreground">{game.releaseYear}</p>
+                  {/* Game Info */}
+                  <div className="prose dark:prose-invert max-w-none mb-8">
+                    <h2>About {game.title}</h2>
+                    <p>
+                      {game.description || "No description available for this game. Experience the adventure for yourself!"}
+                    </p>
+                  </div>
+                  
+                  {/* Review Section */}
+                  <ReviewSection gameId={game.id} />
+                </div>
+                
+                <div className="w-full lg:w-1/3">
+                  {/* Game Details Card */}
+                  <div className="rounded-lg border p-6 shadow-sm bg-card">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <StarRating rating={game.rating || 0} />
+                        <span>{game.rating?.toFixed(1) || "N/A"}</span>
+                      </div>
+                      <div className="text-sm text-muted-foreground">
+                        Release: {game.releaseDate || "Unknown"}
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-medium mb-1">Rating</h3>
-                      <p className="text-muted-foreground">{game.rating.toFixed(1)}</p>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground mb-1">Genres</h3>
+                        <div className="flex flex-wrap gap-2">
+                          {game.genres?.map(genre => (
+                            <span key={genre} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-xs">
+                              {genre}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <h3 className="font-medium text-sm text-muted-foreground mb-1">Price</h3>
+                        <div className="text-xl font-bold">{game.price === "0" ? "Free" : `$${game.price}`}</div>
+                      </div>
+                      
+                      <Button className="w-full">Purchase Game</Button>
                     </div>
                   </div>
-                </motion.div>
-
-                {game.trailer && (
-                  <motion.div 
-                    className="mb-8"
-                    initial={{ y: 20, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.7 }}
-                  >
-                    <h2 className="text-2xl font-bold mb-4">Trailer</h2>
-                    <div className="aspect-video rounded-lg overflow-hidden">
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        src={game.trailer}
-                        title={`${game.title} Trailer`}
-                        frameBorder="0"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        className="w-full h-full"
-                      ></iframe>
-                    </div>
-                  </motion.div>
-                )}
-                
-                {/* Review Section */}
-                <motion.div
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.8 }}
-                >
-                  <ReviewSection gameId={gameId} />
-                </motion.div>
-              </div>
-
-              <div>
-                <motion.div 
-                  className="glass-card p-6 sticky top-4"
-                  initial={{ y: 20, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.6 }}
-                >
-                  <h3 className="text-xl font-bold mb-4">Game Info</h3>
                   
-                  <div className="space-y-4">                    
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Genre</p>
-                      <p className="font-medium">{game.genres.join(", ")}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Release Date</p>
-                      <p className="font-medium">{game.releaseYear}</p>
-                    </div>
-                    
-                    <div>
-                      <p className="text-sm text-muted-foreground mb-1">Rating</p>
-                      <div className="flex items-center">
-                        <StarRating initialRating={game.rating} readonly size="sm" />
-                        <span className="ml-2">({game.rating.toFixed(1)})</span>
+                  {/* System Requirements */}
+                  <div className="rounded-lg border p-6 shadow-sm bg-card mt-6">
+                    <h3 className="font-semibold mb-4">System Requirements</h3>
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Minimum</h4>
+                        <ul className="text-sm space-y-1">
+                          <li>OS: Windows 10</li>
+                          <li>CPU: Intel Core i5-4670K</li>
+                          <li>RAM: 8 GB</li>
+                          <li>GPU: NVIDIA GeForce GTX 760</li>
+                          <li>Storage: 50 GB</li>
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="font-medium text-sm text-muted-foreground mb-1">Recommended</h4>
+                        <ul className="text-sm space-y-1">
+                          <li>OS: Windows 11</li>
+                          <li>CPU: Intel Core i7-8700K</li>
+                          <li>RAM: 16 GB</li>
+                          <li>GPU: NVIDIA GeForce RTX 2070</li>
+                          <li>Storage: 50 GB SSD</li>
+                        </ul>
                       </div>
                     </div>
                   </div>
-                  
-                  <div className="mt-8">
-                    {game.isFree ? (
-                      <Button className="w-full relative overflow-hidden game-btn-hover" data-price="Play Now">Play for Free</Button>
-                    ) : (
-                      <Button className="w-full relative overflow-hidden game-btn-hover" data-price={`Get for $${gamePrice}`}>Get Game</Button>
-                    )}
-                  </div>
-                </motion.div>
-              </div>
-            </div>
-          </div>
-
-          {relatedGames.length > 0 && (
-            <motion.div 
-              className="py-8 bg-muted/10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
-            >
-              <div className="container px-4 md:px-6">
-                <h2 className="text-2xl font-bold mb-6">Similar Games</h2>
-                
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {relatedGames.map((relatedGame) => (
-                    <motion.div 
-                      key={relatedGame.id}
-                      initial={{ y: 20, opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      transition={{ delay: 1 + (0.1 * relatedGame.id % 4) }}
-                      whileHover={{ scale: 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <GameCard
-                        id={relatedGame.id}
-                        title={relatedGame.title}
-                        image={relatedGame.image}
-                        genres={relatedGame.genres}
-                        sponsored={relatedGame.sponsored}
-                      />
-                    </motion.div>
-                  ))}
                 </div>
               </div>
-            </motion.div>
-          )}
-        </motion.div>
-      </main>
-
-      <Footer />
-    </div>
+            </div>
+          </main>
+        </div>
+      </div>
+    </SidebarProvider>
   );
 };
 
